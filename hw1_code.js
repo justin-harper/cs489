@@ -39,7 +39,7 @@ SortedLL489.prototype.add = function(valueToAdd)
         this.m_root = newNode;
         return;
     }
-    else if(newNode.value < this.m_root.value)
+    else if(this.m_compare(newNode.value, this.m_root.value) == -1)
     {
         //insert at beginning of list
 
@@ -62,7 +62,7 @@ SortedLL489.prototype.add = function(valueToAdd)
 
         while(current != null)
         {
-            if(newNode.value < current.value)
+            if(this.m_compare(newNode.value, current.value) == -1)
             {
                 break;
             }
