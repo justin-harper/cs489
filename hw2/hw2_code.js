@@ -20,11 +20,11 @@ function NODE(value)
 
 BST.prototype.compare = function(first, seccond)
 {
-  if(first < seccond)
+  if(first.value < seccond.value)
   {
     return -1;
   }
-  else if(first > seccond)
+  else if(first.value > seccond.value)
   {
     return 1;
   }
