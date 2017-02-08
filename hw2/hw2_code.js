@@ -20,26 +20,24 @@ function NODE(value)
 
 BST.prototype.compare = function(first, seccond)
 {
-  // if(first.value < seccond.value)
-  // {
-  //   return -1;
-  // }
-  // else if(first.value > seccond.value)
-  // {
-  //   return 1;
-  // }
-  // return 0;
+  if(first.value < seccond.value)
+  {
+    return -1;
+  }
+  else if(first.value > seccond.value)
+  {
+    return 1;
+  }
+  return 0;
 };
 
 BST.prototype.add = function(newValue)
 {
-  console.log("adding " + newValue);
   if(this.m_root == null)
   {
     this.m_root = new NODE(newValue);
     this.m_first = this.m_root;
     this.m_last = this.m_root;
-    console.log("added " + newValue + " as root");
     return true;
   }
   else
@@ -98,47 +96,47 @@ BST.prototype.add = function(newValue)
 
 BST.prototype.count = function()
 {
-  // var i = 0;
-  // var current = this.m_first;
-  // while(current!= null)
-  // {
-  //   current = current.next;
-  //   i++;
-  // }
+  var i = 0;
+  var current = this.m_first;
+  while(current!= null)
+  {
+    current = current.next;
+    i++;
+  }
 
-  // return i;
+  return i;
 };
 
 BST.prototype.getLevel = function(value)
 {
-  // if(this.m_root == null)
-  // {
-  //   return -1;
-  // }
-  // if(this.m_root.value == value)
-  // {
-  //   return 0;
-  // }
-  // var i = 0;
-  // var current = this.m_root;
-  // while(current != null)
-  // {
-  //   if(current.value == value)
-  //   {
-  //     return i;
-  //   }
-  //   if(current > value)
-  //   {
-  //     current = current.left;
-  //     i++;
-  //   }
-  //   else
-  //   {
-  //     current = current.right
-  //     i++;
-  //   }
-  // }
-  // return -1;
+  if(this.m_root == null)
+  {
+    return -1;
+  }
+  if(this.m_root.value == value)
+  {
+    return 0;
+  }
+  var i = 0;
+  var current = this.m_root;
+  while(current != null)
+  {
+    if(current.value == value)
+    {
+      return i;
+    }
+    if(current > value)
+    {
+      current = current.left;
+      i++;
+    }
+    else
+    {
+      current = current.right
+      i++;
+    }
+  }
+  return -1;
 };
 
 BST.prototype.getMax = function(current)
@@ -178,276 +176,17 @@ BST.prototype.getMin = function(current)
 
 BST.prototype.has = function(value)
 {
-  // if(this.getLevel(value) >= 0)
-  // {
-  //   return true;
-  // }
-  // else
-  // {
-  //   return false;
-  // }
-};
-
-BST.prototype.remove = function(value)
-{
-  if(this.m_root == null)
+  if(this.getLevel(value) >= 0)
   {
-    return false;
-  }
-  //this.m_root is our value to remove
-  if(this.m_root.value == value)
-  {
-    //remove root
-    if(this.m_root.right != null)
-    {
-      //find min of right side
-      var tmp = this.getMin(this.m_root.right);
-
-      //remove left from parent
-      tmp.parent.left = null;
-
-      //remove parent from tmp
-      tmp.parent = null;
-
-
-      //we are replaceing m_root with tmp
-
-      //fix up parent pointers of m_roots children
-      if(this.m_root.left != null)
-      {
-        this.m_root.left.parent = tmp;
-      }
-
-      if(this.m_root.right != null && this.m_root.right != tmp)
-      {
-        this.m_root.right.parent = tmp;
-      }
-
-      //make m_roots children tmps children
-      if(tmp != this.m_root.right)
-      {
-        tmp.right = this.m_root.right;
-      }
-      tmp.left = this.m_root.left
-
-
-
-
-      //fix up linked list
-      var previous = this.m_root.previous;
-      var next = this.m_root.next;
-
-      if(previous != null)
-      {
-        if(this.m_root != this.m_first)
-        {
-          previous.next = next;
-        }
-        else
-        {
-          this.m_first = this.m_first.next;
-        }
-        if(this.m_root != this.m_last)
-        {
-          previous.next = this.m_root.next;
-        }
-        else
-        {
-          this.m_last = this.m_last.previous;
-        }
-      }
-      //move this.m_root to tmp
-      this.m_root = tmp;
-      return true;
-    }
-    else
-    {
-      if(this.m_root.left == null)
-      {
-        //no right child && no left child...remove m_root
-        this.m_root = null;
-        return true;
-        this.m_first = null;
-        this.m_last = null;
-      }
-      //m_root.right == null
-      //need to replace m_root with largest value on left
-      var tmp = this.getMax(this.m_root.left);
-      //remove right from tmp.parent
-      tmp.parent.right = null;
-
-      //remove parent from tmp
-      tmp.parent = null;
-
-      //we are replaceing m_root with tmp
-
-      //fix up parent pointers of m_roots children
-      //we already know that this.m_root.right == null
-      if(this.m_root.left != null && this.m_root.left != tmp)
-      {
-        this.m_root.left.parent = tmp;
-      }
-
-      //make m_root.left tmp.left
-      if(tmp != this.m_root.left)
-      {
-        tmp.left = this.m_root.left;
-      }
-      //should be null right?
-      tmp.right = this.m_root.right;
-
-      //fix up linked list
-      var previous = this.m_root.previous;
-      var next = this.m_root.next;
-      if(this.m_root != this.m_first)
-      {
-        previous.next = next;
-      }
-      else
-      {
-        this.m_first = this.m_first.next;
-      }
-      if(this.m_root != this.m_last)
-      {
-        previous.next = this.m_root.next;
-      }
-      else
-      {
-        this.m_last = this.m_last.previous;
-      }
-      //move this.m_root to tmp
-      this.m_root = tmp;
-      return true;
-    }
-
+    return true;
   }
   else
   {
-    //not this.m_root...
-    var current = this.m_root;
-    var parent = this.m_root;
-
-    while(current != null)
-    {
-      if(current.value == value)
-      {
-
-        //remove current == parent.right
-        if(current.right != null)
-        {
-          //get min of right side
-          var tmp = this.getMin(current.right);
-
-          //remove left of parrent
-          tmp.parent.left = null;
-
-          //remove parent from tmp and set to currents parent
-          tmp.parent = current.parent;
-
-          //fix up parent pointers of currents children
-          if(current.left != null)
-          {
-            current.left.parent = tmp;
-          }
-          if(current.right != null && current.right != tmp)
-          {
-            current.right.parent = tmp;
-          }
-
-          //make curents children tmps children
-          if(tmp != current.right)
-          {
-            tmp.right = current.right
-          }
-          tmp.left = current.left;
-        }
-        else
-        {
-          //current.right == null
-          //get largest value on left
-          if(current.left != null)
-          {
-            var tmp = this.getMax(current.left);
-
-            //remove right from tmp.parrent
-            tmp.parent.right = null;
-
-            //set tmp.parent = current.parrent
-            tmp.parent = current.parent;
-
-            //we are replacing current with tmp
-
-            //fix up parent pointers of currents children
-            //we already know that current.right == null
-
-            if(current.left != null && current.left != tmp)
-            {
-              current.left.parent = tmp;
-            }
-
-            //make curent.left tmp.left
-            if(tmp != current.left)
-            {
-              tmp.left = current.left
-            }
-            //should be null right?
-            tmp.right = current.right;
-
-          }
-          else
-          {
-            //no left && no right
-            tmp = null;
-          }
-        }
-
-        //fix up curent.parent so it points to tmp
-        if(current == parent.left)
-        {
-          parent.left = tmp;
-        }
-        else
-        {
-          parent.right = tmp;
-        }
-
-        //fix up linked list
-
-        if(current == this.m_first)
-        {
-          this.m_first = this.m_first.next;
-          this.m_first.previous = null;
-        }
-        if(current == this.m_last)
-        {
-          this.m_last = this.m_last.previous;
-          this.m_last.next = null;
-        }
-        if(current.previous != null)
-        {
-          current.previous.next = current.next;
-        }
-        if(current.next != null)
-        {
-          current.next.previous = current.previous;
-        }
-
-      }
-      if(value < current.value)
-      {
-        parent = current;
-        current = current.left;
-      }
-      else
-      {
-        parent = current;
-        current = current.right;
-      }
-    }
-
     return false;
   }
 };
+
+
 
 BST.prototype.toString = function(delimiter, current)
 {
@@ -465,14 +204,231 @@ BST.prototype.toString = function(delimiter, current)
     return "";
   }
   var s = ""
-   s += this.toString(delimiter, current.left) + delimiter;
-   s += current.value + delimiter
-   s += this.toString(delimiter, current.right) + delimiter;
-  return s.trim();
-
-
-
+    s += this.toString(delimiter, current.left) + delimiter;
+    s += current.value + delimiter
+    s += this.toString(delimiter, current.right) + delimiter;
+    return s.trim();
 };
+
+BST.prototype.removeRoot = function(value)
+{
+  if(this.m_root == null)
+  {
+    return false;
+  }
+
+  if(this.m_root.value != value)
+  {
+    return false;
+  }
+
+  //m_root.value == value...need to remove the root node
+  //same rules apply we just need to update m_root when we are done
+
+  if(this.m_root.left === null && this.m_root.right === null)
+  {
+    //no children remove from linked list
+    this.removeFromLinkedList(this.m_root);
+    //just set m_root to null
+    this.m_root = null;
+    return true;
+  }
+  //we have atleast 1 child
+  if(this.m_root.right === null)
+  {
+    //only have left child
+    //need to get max of left sub tree
+    var tmp = getMax(this.m_root.left);
+
+    //remove tmp from tree (leaf node)
+    tmp.parent.right = null;
+
+    //m_root.parrent = null so make tmp.parent null
+    tmp.parent = null;
+
+    //m_root.right is null so we don't have to worry about that
+    //make tmp.left -> m_root.left
+    tmp.left = this.m_root.left;
+    if(tmp.left !== null)
+    {
+      tmp.left.parent = tmp;
+    }
+
+
+    removeFromLinkedList(this.m_root);
+    this.m_root = tmp;
+    return true;
+  }
+  else
+  {
+    //we have a right child and maybe a left child
+    //get min of right sub tree
+
+    var tmp = this.getMin(this.m_root.right);
+
+    //remove tmp from tree(leaf)
+    tmp.parent.left = null;
+
+    //set tmp.parent to null
+    tmp.parent = null;
+
+    tmp.right = this.m_root.right;
+    if(tmp.right != null)
+    {
+      tmp.right.parent = tmp;
+    }
+    //need to allow for the left subtree not being null...
+    //because of bst m_root.left < tmp.min
+    var tmp2 = this.getMin(tmp.right);
+    tmp2.left = this.m_root.left;
+
+    this.removeFromLinkedList(this.m_root);
+    this.m_root = tmp;
+    return true;
+  }
+  console.log("removeRoot(): HIT!!");
+  return false; //?
+}
+
+BST.prototype.remove = function(value)
+{
+  if(this.m_root == null)
+  {
+    return false;
+  }
+
+  if(this.removeRoot(value) == true)
+  {
+    return true;
+  }
+
+  var current = this.m_root;
+  while(current != null)
+  {
+    if(value < current.value)
+    {
+      current = current.left;
+    }
+    else if(value > current.value)
+    {
+      current = current.right;
+    }
+    else
+    {
+      //remove this node
+      return this.removeThisNode(current);
+    }
+  }
+  return false;
+}
+
+BST.prototype.removeThisNode = function(current)
+{
+  //current is the node we are removing
+  if(current.left === null && current.right === null)
+  {
+    //current is a leaf...set parent->current to null
+    if(current == current.parent.right)
+    {
+      current.parent.right = null;
+    }
+    else
+    {
+      current.parent.left = null;
+    }
+    //we are done
+    this.removeFromLinkedList(current);
+    return true;
+  }
+  //we have atleast 1 child
+  if(current.right === null)
+  {
+    //only left exists
+    //need to get max of left sub tree
+    var tmp = this.getMax(current.left);
+
+    //remove tmp from tree (it is a leaf)
+    tmp.parent.right = null;
+
+    //set tmp's parent ptr
+    tmp.parent = current.parent;
+
+    /***************
+    need to make tmp.left/right point to something....lol
+    ***************/
+
+    tmp.left = current.left;
+    if(tmp.left !== null)
+    {
+      tmp.left.parent = tmp;
+    }
+
+    //make parent->current point to tmp instead
+    if(current == current.parent.right)
+    {
+      current.parent.right = tmp;
+    }
+    else
+    {
+      current.parent.left = tmp;
+    }
+    this.removeFromLinkedList(current);
+    return true;
+  }
+  else
+  {
+    //we have a right child
+
+    //get min of right sub tree
+    var tmp = this.getMin(current.right);
+
+    //remove tmp from tree (leaf)
+    tmp.parent.left = null;
+
+    //set tmp's parrent ptr
+    tmp.parent = current.parent;
+
+    if(current == current.parent.right)
+    {
+      current.parent.right = tmp;
+    }
+    else
+    {
+      current.parent.left = tmp;
+    }
+    //NEED TO FIX UP PARRENT.LEFT PARRENT.RIGHT other wise
+    //we lose the rest of the tree
+
+    var tmp2 = this.getMin(tmp.right);
+    tmp2.left = current.left;
+
+
+    this.removeFromLinkedList(current);
+    return true;
+  }
+  console.log("removeThisNode(): hit!");
+  return false;
+}
+
+BST.prototype.removeFromLinkedList = function(current)
+{
+  if(this.m_first == current)
+  {
+    this.m_first = current.next;
+  }
+  if(this.m_last == current)
+  {
+    this.m_last = current.previous;
+  }
+  if(current.previous != null)
+  {
+    current.previous.next = current.next;
+  }
+  if(current.next != null)
+  {
+    current.next.previous = current.previous;
+  }
+}
 
 BST.prototype.forEach = function()
 {
