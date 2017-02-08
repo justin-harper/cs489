@@ -454,11 +454,29 @@ BST.prototype.removeFromLinkedList = function(current)
   }
 };
 
-BST.prototype.forEach = function(callback, useInsertionOrder)
+BST.prototype.forEach = function(callback, useInsertionOrder, current)
 {
   if(useInsertionOrder === true)
   {
-    callback.call(this.m_first, this.m_root);
+    var c = this.m_first;
+    while(c !== null)
+    {
+      callback.call(this.m_root, c.value);
+      c = c.next;
+    }
+  }
+  else
+  {
+    if(current === undefined)
+    {
+      current = this.m_root;
+    }
+    if(current !== null)
+    {
+      this.forEach(callback, useInsertionOrder, current.left);
+      callback.call(this.m_root, current.value);
+      this.forEach(callback, useInsertionOrder, current.right);
+    }
   }
 };
 
