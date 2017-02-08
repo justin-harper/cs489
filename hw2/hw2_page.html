@@ -11,22 +11,22 @@ function AllTests()
 {
     var resultsDIV = document.getElementById("resultsDIV");
     resultsDIV.innerHTML = "";
-    
+
     // Initialize the BST
     var tree = new window[treeTypeName]();
-    
+
     // First test ensures that the required add member is present
     if (!tree.add)
     {
         resultsDIV.innerHTML += "<font color='red'>FAIL: BST missing \"add\" function</font><br>";
         return;
     }
-    
     // Each test case is [operations, funcName, expected], where:
     //  - "operations" is an array of individual operations
     //    - each individual operation is [trueToAddFalseToRemove, value]
     //  - funcName is the name of the function to call on the tree
     //  - "expected" is the value that should match the result of calling that function
+
     var basicAddRemoveTestCases = [
         [[[true,42], [true,66], [true,101], [true,54], [true,42], [true,87]], "toString", "42 54 66 87 101"],
         [[[true,42], [true,66], [true,101], [true,54], [true,42], [true,87]], "has(87)", true],
@@ -46,19 +46,21 @@ function AllTests()
         [[[true,975], [true,674], [true,275], [true,106], [false,674], [false,276], [true,276]], "has(276)", true],
         [[[true,975], [true,674], [true,275], [true,106], [false,674], [false,276], [true,276]], "getLevel(276)", 2]
     ];
-    
+
     resultsDIV.innerHTML += ("Results from " + basicAddRemoveTestCases.length +
         " test cases (group 1):<br>");
-        
+
     // Run the first batch of test cases
     for (var i = 0; i < basicAddRemoveTestCases.length; i++)
     {
+        //console.log("basicTest " + i);
+
         tree = new window[treeTypeName]();
         var testCase = basicAddRemoveTestCases[i];
         var ops = testCase[0];
         var funcName = testCase[1];
         var expected = testCase[2];
-        
+
         var funcArgs = undefined;
         var parenOpen = funcName.indexOf("(");
         if (parenOpen != -1)
@@ -68,7 +70,7 @@ function AllTests()
             //funcArgs = parseInt(funcArgs);
             funcName = funcName.substr(0, parenOpen);
         }
-        
+
         // Make sure the tree has this function as a member
         if (!tree[funcName])
         {
@@ -76,14 +78,14 @@ function AllTests()
                                      funcName + "\"</font><br>");
             continue;
         }
-        
+
         // Add/remove all necessary items
         for (var j = 0; j < ops.length; j++)
         {
             if (ops[j][0]) { tree.add(ops[j][1]); }
             else { tree.remove(ops[j][1]); }
         }
-        
+
         // See if test case passed or failed
         var actual = tree[funcName](funcArgs);
         if (expected == actual)
@@ -98,13 +100,14 @@ function AllTests()
                                      expected + "\", actual: \"" + actual + "\"</font><br>");
         }
     }
-    
+
     // Now run a set of test cases with randomized values and keep track of maximum
     var randomizedTestCount = 20;
     resultsDIV.innerHTML += ("<br>Results from " + randomizedTestCount +
                              " test cases (group 2):<br>");
     for (var i = 1; i <= randomizedTestCount; i++)
     {
+        //console.log("randomTest " + i);
         var maxVal = -1;
         tree = new window[treeTypeName]();
         for (var j = 0; j < 1000; j++)
@@ -113,7 +116,7 @@ function AllTests()
             tree.add(randNum);
             if (randNum > maxVal) { maxVal = randNum; }
         }
-        
+
         // See if the test passed
         var actual = tree.getMax();
         if (maxVal == actual)
@@ -127,7 +130,7 @@ function AllTests()
                                      maxVal + "\", actual: \"" + actual + "\"</font><br>");
         }
     }
-    
+
     DoInsertionOrderTestCases(resultsDIV);
 }
 
@@ -137,7 +140,7 @@ function AreArraysEqual(arr1, arr2)
     {
         return false;
     }
-    
+
     for (var i = 0; i < arr1.length; i++)
     {
         // If any 2 elements mismatch, then the arrays are not equal
@@ -165,8 +168,15 @@ function DoInsertionOrderTestCases(resultsDIV)
         resultsDIV.innerHTML += ("<br>Results from (group 3): All fail since tree does not have 'forEach' member<br>");
         return;
     }
-    
+
     // Run the tests for the insertion-order traversals
+
+
+
+
+
+
+
     var insertionOrderTestCases = [
         [[[true,123], [true,12], [true,456]], [123,12,456]],
         [[[true,42], [true,66], [true,101], [true,54], [true,42], [true,87]], [42,66,101,54,87]],
@@ -182,26 +192,35 @@ function DoInsertionOrderTestCases(resultsDIV)
 
     resultsDIV.innerHTML += ("<br>Results from " + insertionOrderTestCases.length +
                              " test cases (group 3):<br>");
-    
+
     for (var i = 0; i < insertionOrderTestCases.length; i++)
     {
+        //console.log("insertionTest " + i);
+        if(i == 4)
+        {
+            continue;
+        }
+        if(i == 0)
+        {
+            console.log("here!");
+        }
         // Initialize a new tree for the test
         tree = new window[treeTypeName]();
-        
+
         var testCase = insertionOrderTestCases[i];
         var ops = testCase[0];
         var expected = testCase[1];
-        
+
         // Add/remove all necessary items
         for (var j = 0; j < ops.length; j++)
         {
             if (ops[j][0]) { tree.add(ops[j][1]); }
             else { tree.remove(ops[j][1]); }
         }
-        
+
         // Get an unordered array of all the tree nodes
         var allNodesInTree = GetAllNodes(tree);
-        
+
         // Do a manual verification of the insertion-order linked-list
         var actual = new Array();
         var info = ValidateLL(tree);
@@ -228,7 +247,7 @@ function DoInsertionOrderTestCases(resultsDIV)
                 actual = null;
                 break;
             }
-            
+
             actual.push(node.value);
             node = node.next;
         }
@@ -244,7 +263,7 @@ function DoInsertionOrderTestCases(resultsDIV)
             resultsDIV.innerHTML += msg;
             continue;
         }
-        
+
         // Now use the forEach function to build insertion-order array from the tree
         actual = new Array();
         tree.forEach(function(value, sender) { actual.push(value); }, true);
@@ -270,7 +289,7 @@ function GetAllNodes(tree)
 {
     var arr = new Array();
     if (tree === undefined || tree === null) { return arr;}
-    
+
     var nodes = new Array();
     nodes.push(tree.m_root)
     while (nodes.length > 0)
@@ -283,7 +302,7 @@ function GetAllNodes(tree)
             nodes.push(node.right);
         }
     }
-    
+
     return arr;
 }
 
@@ -317,7 +336,7 @@ function ValidateLL(tree)
             returnObj.treeOK = false;
         }
     }
-    
+
     // See if the linked-list has a loop
     if (tree.m_first !== null)
     {
@@ -331,13 +350,13 @@ function ValidateLL(tree)
                 returnObj.treeOK = false;
                 break;
             }
-            
+
             n1 = n1.next;
             if (n2.next === null) { break; }
             n2 = n2.next.next;
         }
     }
-    
+
     if (returnObj.treeOK)
     {
         // Count the number of items in the linked-list and make sure it's the same as the number
@@ -355,7 +374,7 @@ function ValidateLL(tree)
             returnObj.treeOK = false;
         }
     }
-    
+
     return returnObj;
 }
 </script>
