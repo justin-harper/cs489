@@ -461,7 +461,7 @@ BST.prototype.forEach = function(callback, useInsertionOrder, current)
     var c = this.m_first;
     while(c !== null)
     {
-      callback.call(this.m_root, c.value);
+      callback.call(this, c.value, this.m_root);
       c = c.next;
     }
   }
@@ -474,7 +474,7 @@ BST.prototype.forEach = function(callback, useInsertionOrder, current)
     if(current !== null)
     {
       this.forEach(callback, useInsertionOrder, current.left);
-      callback.call(this.m_root, current.value);
+      callback.call(this, current.value, this.m_root);
       this.forEach(callback, useInsertionOrder, current.right);
     }
   }
