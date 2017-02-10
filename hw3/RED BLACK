@@ -1,0 +1,51 @@
+RED BLACK
+
+Insert
+1. noraml bst insertion, create new node n
+2. paint n red
+3. balance(n)
+
+balance(node)
+  case 1: node is root -> paint node black, return true
+  case 2: node parent is black -> return true
+
+  for remaining, cases:
+  P = parent of N
+  U = uncle of N
+  G = grandparent of N
+
+    P is red
+    G is black
+    U is red, black or null(black)
+
+  case 3: P and U are red
+          change P and U to black
+          change G to red
+          return balance(G)
+
+  case 4: (zig-zag) (N == P->right && P == G->left) || (N == P->left && P = G->right) also U is black and P is red
+          Rotate left or right(P)
+          Fall through to case 5
+
+
+  case 5: (N==P.left and G.left == P || (N == P.right and G.right == P) (not zig zag)
+              ||                                  ||
+          RotateRight(G)                      RotateLeft(G)
+          return true
+
+
+
+
+rotateLeft(A)
+  A may be root if so A.parent == null
+
+
+    P(maybe null)       P (maybe null)
+    |                   |
+    A                   B
+   / \                 / \
+  1   B       ==>     A   3
+     / \             / \
+    2   3           1   2
+
+
