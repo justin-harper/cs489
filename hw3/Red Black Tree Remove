@@ -1,0 +1,47 @@
+Red Black Tree Remove
+Wikipedia has rules
+8 - 10 cases for removing a node
+
+bool RBT.Remove(Node node)
+{
+
+  1.  If node has 2 children
+      swap max from left sub-tree
+      recursively delete max
+
+  2.  If node is red (has 1 or 0 children)
+      return BST.remove(node);
+
+  3.  (node is black && 1 or 0 children)
+
+      PrepareForRemove(node);
+      return BST.remove(node);
+      // p = parent
+      // s = sibling
+
+}
+
+
+PrepareForRemove(Node node)
+{
+  1.  if(node==root) {return;} ** may leave the root red
+
+  2.  sibling is red, parent is black, siblings children are black (if they exist)
+      rotate on parent
+      make sibling black and parent red
+      fall through //reassign s?
+
+  3.  node, parent, sibling and siblings children are black
+      make sibling red
+      return PrepareForRemove(parent);
+
+  4.  sibling and siblings children are black, parent is red
+      make p black and s red
+      return;
+
+  5.  sibling is black and s.left red, s.right black, node is left child of parent, or mirror
+      make s.left black s red and rotate(s)
+
+  6.  s black,
+
+}
