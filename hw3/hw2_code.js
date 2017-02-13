@@ -91,6 +91,46 @@ BST.prototype.add = function(newValue)
 
 };
 
+BST.prototype.addMultiple = function(arrOfValues)
+{
+  var count = 0;
+
+  for(var i = 0; i < arrOfValues.length; i++)
+  {
+    if(this.add(arrOfValues[i]) === true)
+    {
+      count++;
+    }
+  }
+
+  return count;
+};
+
+BST.prototype.clear = function()
+{
+  this.m_root = null;
+  this.m_first = null;
+  this.m_last = null;
+};
+
+BST.prototype.countLevels = function(current)
+{
+  if(current === undefined)
+  {
+    current = this.m_root;
+  }
+  if(current === null)
+  {
+    return 0;
+  }
+  if(current.left === null && current.right === null)
+  {
+    return 1;
+  }
+
+  return max(countLevels(current.left), countLevels(current.right)) + 1;
+}
+
 
 
 
