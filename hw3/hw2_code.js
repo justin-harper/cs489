@@ -38,7 +38,7 @@ BST.prototype.add = function(newValue)
     this.m_root = new NODE(newValue);
     this.m_first = this.m_root;
     this.m_last = this.m_root;
-    return true;
+    return this.m_root;
   }
   else
   {
@@ -50,7 +50,7 @@ BST.prototype.add = function(newValue)
 
       if(current.value == newValue)
       {
-        return false;
+        return null;
       }
       else if(current.value > newValue)
       {
@@ -64,7 +64,7 @@ BST.prototype.add = function(newValue)
           this.m_last.next = current;
           current.previous = this.m_last;
           this.m_last = current;
-          return true;
+          return current;
         }
       }
       else
@@ -79,7 +79,7 @@ BST.prototype.add = function(newValue)
           this.m_last.next = current;
           current.previous = this.m_last;
           this.m_last = current;
-          return true;
+          return current;
         }
 
       }
@@ -87,7 +87,7 @@ BST.prototype.add = function(newValue)
 
   }
   console.log("BST.add(): Um..not supposed to be here " + newValue );
-  return false;
+  return null;
 
 };
 
