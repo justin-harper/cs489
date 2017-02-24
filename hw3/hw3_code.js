@@ -7,9 +7,23 @@
 function Set489(compareFunction)
 {
     // your code here
-
-
+  BST.call(this, compareFunction);
 }
+Set489.prototype = Object.create(BST.prototype);
+
+
+
+Set489.prototype.add = function(value)
+{
+  BST.prototype.add.call(this, value);
+};
+
+Set489.prototype.remove = function(value)
+{
+
+};
+
+
 
 Set489.prototype.forEach = function(callback, useInsertionOrder)
 {
