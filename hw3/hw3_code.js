@@ -122,7 +122,7 @@ Set489.prototype.InsertCase1 = function(node)
 
 Set489.prototype.InsertCase2 = function(node)
 {
-  if(GetNodeColor(node) === BLACK)
+  if(this.GetNodeColor(node) === this.BLACK)
   {
     return;
   }
@@ -184,9 +184,61 @@ Set489.prototype.InsertCase5 = function(node)
 
 Set489.prototype.add = function(value)
 {
-  var node = BST.prototype.add.call(this, value);
+  var newNode = new NODE(value);
 
-  this.Balance(node);
+  if(this.m_root === null)
+  {
+    this.m_root = newNode;
+    this.m_first = this.m_root;
+    this.m_last = this.m_root;
+    this.Balance(newNode);
+    return true;
+  }
+
+    var node = this.m_root;
+    while(true)
+    {
+      if(value < node.value)
+      {
+        if(node.left === null)
+        {
+
+          node.left = newNode;
+          newNode.parent = node;
+          this.m_last.next = newNode;
+          newNode.previous = this.m_last;
+          this.m_last = newNode;
+          this.Balance(newNode);
+          return true;
+        }
+        else
+        {
+          node = node.left;
+        }
+      }
+      else if(value > node.value)
+      {
+        if(node.right === null)
+        {
+          node.right = newNode;
+          newNode.parent = node;
+          this.m_last.next = newNode;
+          newNode.previous = this.m_last;
+          this.m_last = newNode;
+          this.Balance(newNode);
+          return true;
+        }
+        else
+        {
+          node = node.right;
+        }
+      }
+      else
+      {
+        //value === node.value
+        return false;
+      }
+    }
 };
 
 Set489.prototype.remove = function(value)
@@ -195,7 +247,7 @@ Set489.prototype.remove = function(value)
 
   if(node === null)
   {
-    return;
+    return false;
   }
 
   if(node.left !== null & node.right !== null)
@@ -206,7 +258,7 @@ Set489.prototype.remove = function(value)
       pre = pre.right;
     }
     node.value = pre.value;
-    BST.prototype.removeFromLinkedList.call(this, node);
+    //BST.prototype.removeFromLinkedList.call(this, node);
     node = pre;
   }
 
@@ -223,11 +275,14 @@ Set489.prototype.remove = function(value)
   {
     this.m_root.color = this.BLACK;
   }
+  BST.prototype.removeFromLinkedList.call(this, node);
+  return true;
 };
 
 Set489.prototype.BalanceDeleteNode = function(node, child)
 {
   this.DeleteCase1(node);
+
 };
 
 Set489.prototype.DeleteCase1 = function(node)
@@ -236,6 +291,7 @@ Set489.prototype.DeleteCase1 = function(node)
   {
     this.DeleteCase2(node);
   }
+
 };
 
 Set489.prototype.DeleteCase2 = function(node)
@@ -354,9 +410,36 @@ Set489.prototype.GetNodeColor = function(node)
 }
 
 
-Set489.prototype.forEach = function(callback, useInsertionOrder)
+Set489.prototype.forEach = function(callback, useInsertionOrder, current)
 {
-  return BST.forEach.call(callback, useInsertionOrder);
+  //return BST.prototype.forEach.call(this, callback, useInsertionOrder);
+
+  if(useInsertionOrder === true)
+  {
+    var c = this.m_first;
+    while(c !== null)
+    {
+      callback.call(this, c.value, this.m_root);
+      c = c.next;
+    }
+  }
+  else
+  {
+    if(current === undefined)
+    {
+      current = this.m_root;
+    }
+    if(current === undefined)
+    {
+      return
+    }
+    if(current != null)
+    {
+      this.forEach(callback, useInsertionOrder, current.left);
+      callback.call(this, current.value, this.m_root);
+      this.forEach(callback, useInsertionOrder, current.right);
+    }
+  }
 };
 
 // and more of your code down here

@@ -38,7 +38,7 @@ BST.prototype.add = function(newValue)
     this.m_root = new NODE(newValue);
     this.m_first = this.m_root;
     this.m_last = this.m_root;
-    return this.m_root;
+    return true;
   }
   else
   {
@@ -50,7 +50,7 @@ BST.prototype.add = function(newValue)
 
       if(current.value == newValue)
       {
-        return null;
+        return false;
       }
       else if(current.value > newValue)
       {
@@ -64,7 +64,7 @@ BST.prototype.add = function(newValue)
           this.m_last.next = current;
           current.previous = this.m_last;
           this.m_last = current;
-          return current;
+          return true;
         }
       }
       else
@@ -79,7 +79,7 @@ BST.prototype.add = function(newValue)
           this.m_last.next = current;
           current.previous = this.m_last;
           this.m_last = current;
-          return current;
+          return true;
         }
 
       }
@@ -87,7 +87,7 @@ BST.prototype.add = function(newValue)
 
   }
   console.log("BST.add(): Um..not supposed to be here " + newValue );
-  return null;
+  return false;
 
 };
 
@@ -118,6 +118,10 @@ BST.prototype.countLevels = function(current)
   if(current === undefined)
   {
     current = this.m_root;
+    if(current === null)
+    {
+      return -1;
+    }
   }
   if(current === null)
   {
@@ -128,7 +132,12 @@ BST.prototype.countLevels = function(current)
     return 1;
   }
 
-  return max(countLevels(current.left), countLevels(current.right)) + 1;
+  return this.max(this.countLevels(current.left), this.countLevels(current.right)) + 1;
+}
+
+BST.prototype.max = function(val1, val2)
+{
+  return val1 > val2? val1 : val2;
 }
 
 
@@ -357,65 +366,55 @@ BST.prototype.removeMe = function(current)
 
 BST.prototype.removeWithBothChildren = function(current)
 {
-  //we have both children... ;(
-  if(current.value > current.parent.value)
+  //               x
+  //             /   \
+  //            A     B
+  //           / \   / \
+  //          1   2 3   4
+  //
+  //
+  //
+  //              want
+  //               B
+  //             /   \
+  //            3     4
+  //           /
+  //          A
+  //         / \
+  //        1   2
+
+
+  // current = x
+
+  var A = current.left;
+  var B = current.right;
+  if(B.left === null)
   {
-    //we are on the right side
-    var tmp = this.getMin(current.right);
-    if(tmp.right !== null)
-    {
-      var tmpMax = this.getMax(tmp.right);
-      tmpMax.right = current.right;
-      current.right.parent = tmpMax;
-      current.parent.right = tmp;
-      tmp.left = current.left;
-      this.removeFromLinkedList(current);
-      return true;
-    }
-    //tmp is a leaf
-
-    tmp.parent.left = null;
-    tmp.parent = current.parent;
-
-    tmp.right = current.right;
-    current.right.parent = tmp;
-
-    tmp.left = current.left;
-    current.left.parent = tmp;
-
-    current.parent.right = tmp;
-
-    this.removeFromLinkedList(current);
-    return true;
+    //3 is null
+    B.left = A;
   }
   else
   {
-    //we are on the left
-    var tmp = this.getMin(current.right);
-    if(tmp.right !== null)
-    {
-      var tmpMax = this.getMax(tmp.right);
-      tmpMax.right = current.right;
-      current.right.parent = tmpMax;
-      current.parent.left = tmp;
-      tmp.left = current.left;
-      this.removeFromLinkedList(current);
-      return true;
-    }
-    //tmp is a leaf
-    tmp.parent.left = null;
-    tmp.parent = current.parent;
-
-    tmp.right = current.right;
-    current.right.parent = tmp;
-
-    tmp.left = current.left;
-    current.left.parent = tmp;
-
-    current.parent.left = tmp;
-    this.removeFromLinkedList(current);
-    return true;
+    var C = this.getMin(B.left); //C = min of 3
+    C.left = A;
   }
+
+  if(current.value < current.parent)
+  {
+    current.parent.left = B;
+    B.parent = current.parent;
+    this.removeFromLinkedList(current);
+  }
+  else
+  {
+    current.parent.right = B;
+    B.parent = current.parent;
+    this.removeFromLinkedList(current);
+  }
+
+
+
+
 }
 
 BST.prototype.removeNoLeft = function(current)
@@ -510,6 +509,10 @@ BST.prototype.forEach = function(callback, useInsertionOrder, current)
     if(current === undefined)
     {
       current = this.m_root;
+    }
+    if(current === undefined)
+    {
+      return;
     }
     if(current !== null)
     {

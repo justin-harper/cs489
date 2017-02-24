@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<script src="hw2_code.js"></script>
+<script src="hw3_code.js"></script>
+
+<script>
+function doThing()
+{
+  var tree = new BST();
+
+  tree.add(22);
+  tree.add(77);
+  tree.add(19);
+  tree.add(80);
+  tree.add(64);
+  tree.add(89763);
+  tree.add(4588);
+  tree.add(1);
+  tree.add(2);
+  tree.add(3);
+  tree.remove(77);
+
+  var results = document.getElementById('results');
+  results.innerHTML += "Here we go <br>";
+}
+
+</script>
+
+<body onload="doThing()">
+<h2> Test results:</h2><br>
+<div id="results"></div>
+
+</html>
