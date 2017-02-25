@@ -8,243 +8,385 @@ function Set489(compareFunction)
 {
     // your code here
   BST.call(this, compareFunction);
-  var BLACK = 'black';
-  var RED = 'red';
+  this.BLACK = 'black';
+  this.RED = 'red';
 };
 
 Set489.prototype = Object.create(BST.prototype);
 
-
-Set489.prototype.find = function(value)
+Set489.prototype.GetNodeColor = function(node)
 {
-  var current = this.m_root;
-  while(current != null)
-  {
-    if(current.value === value)
-    {
-      return current;
-    }
-    else if(current.value < value)
-    {
-      current = current.left;
-    }
-    else
-    {
-      current = current.right;
-    }
-  }
-
-  return current;
+  return node === null ? this.BLACK : node.color;
 };
 
-
-Set489.prototype.GetGrandParent = function(node)
+Set489.prototype.GetGranparent = function(node)
 {
-  if(node.parent === null)
+  if(node.parent !== null && node.parent.parent !== null)
   {
-    return null;
+    return node.parent.parent;
   }
-  return node.parent.parent;
-};
-
-Set489.prototype.GetSibling = function(node)
-{
-  if(this.parent === null)
-  {
-    return null;
-  }
-  return node === node.parent.left ? node.parent.right : node.parent.left;
-};
+  else return null;
+}
 
 Set489.prototype.GetUncle = function(node)
 {
-  if(this.parent === null)
+  var gp = this.GetGranparent(node);
+  if(gp !== null)
   {
-    return null;
-  }
-  return this.GetSibling(node.parent);
-};
-
-Set489.prototype.SwapNode = function(replaceMe, withMe)
-{
-  if(replaceMe.parent === null)
-  {
-    this.m_root = withMe;
-  }
-  else
-  {
-    if(replaceMe === replaceMe.parent.left)
+    if(node === gp.left)
     {
-      replaceMe.parent.left = withMe;
+      return gp.right;
     }
     else
     {
-      replaceMe.parent.right = withMe;
+      return gp.left;
     }
-    if(withMe !== null)
-    {
-      withMe.parent = replaceMe.parent;
-    }
-  }
-};
-
-Set489.prototype.RotateLeft = function(node)
-{
-  var right = node.right;
-  this.SwapNode(node, right);
-
-  node.right = right.left;
-  if(right.left !== null)
-  {
-    right.left.parent = node;
-  }
-  node.parent = right;
-};
-
-Set489.prototype.RotateRight = function(node)
-{
-  var left = node.left;
-  this.SwapNode(node, left);
-
-  node.left = left.right;
-  if(left.right !== null)
-  {
-    left.right.parent = node;
-  }
-  left.right = node;
-  node.parent = left;
-};
-
-Set489.prototype.InsertCase1 = function(node)
-{
-  node.color = this.BLACK;
-};
-
-Set489.prototype.InsertCase2 = function(node)
-{
-  if(this.GetNodeColor(node) === this.BLACK)
-  {
-    return;
-  }
-  this.InsertCase3(node);
-};
-
-Set489.prototype.InsertCase3 = function(node)
-{
-  var Uncle = this.GetUncle(node);
-  var GrandParent = this.GetGrandParent(node);
-
-  if(Uncle !== null && this.GetNodeColor(Uncle) === this.RED)
-  {
-    node.parent.color = this.BLACK;
-    Uncle.color = this.BLACK;
-    GrandParent.color = this.RED;
-    this.InsertCase1(GrandParent);
   }
   else
   {
-    this.InsertCase4(node);
+    return null;
   }
-};
+}
+
+Set489.prototype.add = function(value)
+{
+  var node = BST.prototype.add2.call(this, value);
+  if(node === false)
+  {
+    return false;
+  }
+  node.color = this.RED;
+  return this.InsertCase1(node);
+}
+
+Set489.prototype.InsertCase1 = function(node)
+{
+  if(node.parent === null)
+  {
+    node.color = this.BLACK;
+    return true;
+  }
+  else
+  {
+    return this.InsertCase2(node);
+  }
+}
+
+Set489.prototype.InsertCase2 = function(node)
+{
+  if(node.parent.color === this.BLACK)
+  {
+    return true;
+  }
+  else
+  {
+    return this.InsertCase3(node);
+  }
+}
+
+Set489.prototype.InsertCase3 = function(node)
+{
+  var U = this.GetUncle(node);
+
+  if(U !== null && U.color === this.RED)
+  {
+    node.parent.color = this.BLACK;
+    U.color = this.BLACK;
+    var G = this.GetGranparent(node);
+    G.color = this.RED;
+    return this.InsertCase1(G);
+  }
+  else
+  {
+    return this.InsertCase4(node);
+  }
+}
 
 Set489.prototype.InsertCase4 = function(node)
 {
-  var GrandParent = this.GetGrandParent(node);
+  var G = this.GetGranparent(node);
 
-  if(node === node.parent.right && node.parent === GrandParent.left)
+  if(node === node.parent.right && node.parent === G.left)
   {
     this.RotateLeft(node.parent);
     node = node.left;
   }
-  else if(node === node.parent.left && node.parent === GrandParent.right)
+  else if(node === node.parent.left && node.parent === G.right)
   {
     this.RotateRight(node.parent);
     node = node.right;
   }
 
-  this.InsertCase5(node);
+  return this.InsertCase5(node);
 }
 
 Set489.prototype.InsertCase5 = function(node)
 {
-  var GrandParent = this.GetGrandParent(node);
+  var G = this.GetGranparent(node);
+
   node.parent.color = this.BLACK;
-  GrandParent.color = this.RED;
+  G.color = this.RED;
 
-  if(node === node.parent.left && node.parent === GrandParent.left)
+  if(node === node.parent.left)
   {
-    this.RotateRight(GrandParent);
+    this.RotateRight(G);
   }
-  else if(node === node.parent.right && node.parent === GrandParent.right)
+  else
   {
-    this.RotateLeft(GrandParent);
+    this.RotateLeft(G);
   }
-};
 
+  return true;
+}
 
-Set489.prototype.add = function(value)
+Set489.prototype.RotateRight = function(B)
 {
-  var newNode = new NODE(value);
-
-  if(this.m_root === null)
+  if(B.parent !== null)
   {
-    this.m_root = newNode;
-    this.m_first = this.m_root;
-    this.m_last = this.m_root;
-    this.Balance(newNode);
-    return true;
-  }
+    var P = B.parent;
 
-    var node = this.m_root;
-    while(true)
+    if(P !== null)
     {
-      if(value < node.value)
-      {
-        if(node.left === null)
-        {
+      var A = B.left;
 
-          node.left = newNode;
-          newNode.parent = node;
-          this.m_last.next = newNode;
-          newNode.previous = this.m_last;
-          this.m_last = newNode;
-          this.Balance(newNode);
-          return true;
-        }
-        else
-        {
-          node = node.left;
-        }
-      }
-      else if(value > node.value)
+      if(A !== null)
       {
-        if(node.right === null)
+        var two = A.right;
+        if(B === P.left)
         {
-          node.right = newNode;
-          newNode.parent = node;
-          this.m_last.next = newNode;
-          newNode.previous = this.m_last;
-          this.m_last = newNode;
-          this.Balance(newNode);
-          return true;
+          P.left = A;
         }
         else
         {
-          node = node.right;
+          P.right = A;
         }
+        A.parent = P;
+        A.right = B;
+        B.parent = A;
+        B.left = two;
+        if(two !== null)
+        {
+          two.parent = B;
+        }
+        return;
       }
       else
       {
-        //value === node.value
-        return false;
+        return;
       }
     }
+    else
+    {
+      // P === null ==> B is m_root
+
+      var A = B.left;
+      if(A !== null)
+      {
+        A.parent = null;
+        A.right = B;
+        B.parent = A;
+        B.left = two;
+        if(two !== null)
+        {
+          two.parent = B;
+        }
+        return;
+      }
+    }
+  }
+}
+
+Set489.prototype.RotateLeft = function(A)
+{
+  var P = A.parent;
+
+  if(P !== null)
+  {
+
+    var B = A.right;
+
+    if(B !== null)
+    {
+      var two = B.left;             //        P                       P
+                                    //        |                       |
+                                    //        A                       B
+      if(A === P.Left)              //       / \                     / \
+      {                             //      1   B     ==>           A   3
+        P.left = B;                 //         / \                 / \
+      }                             //        2   3               1   2
+      else
+      {
+        P.right = B;
+      }
+
+      B.parent = P;
+
+      B.left = A;
+      A.parent = B;
+      A.right = two;
+      if(two !== null)
+      {
+        two.parent = A;
+      }
+      return;
+    }
+    else
+    {
+      //B is null                   //    P
+     return;                        //    |
+                                    //    A
+                                    //   / \
+                                    //  1   null
+    }
+ }
+ else
+ {
+  //P is Null ==> A is this.m_root
+
+
+
+  var B = A.right;
+
+  if(B !== null)
+  {
+    var two = B.left;
+
+
+    B.parent = null;
+    B.left = A;
+    A.parent = B;
+    A.right = two;
+    if(two !== null)
+    {
+      two.parent = A;
+    }
+    this.m_root = B;
+    return;
+  }
+ }
+}
+
+
+Set489.prototype.GetSibling = function(node)
+{
+  if(node === null || node.parent === null)
+  {
+    return null;
+  }
+  if(node === node.parent.left)
+  {
+    return node.parent.right;
+  }
+  else
+  {
+    return node.parent.left;
+  }
+}
+
+
+Set489.prototype.FindNode = function(value)
+{
+  if(value === undefined)
+  {
+    return null;
+  }
+  var node = this.m_root;
+
+  while(node !== null)
+  {
+    if(node.value === value)
+    {
+      return node;
+    }
+    else if(node.value > value)
+    {
+      node = node.left;
+    }
+    else
+    {
+      node = node.right;
+    }
+  }
+  return null;
+}
+
+
+
+Set489.prototype.SwapNode = function(replaceMe, withMe)
+{
+  if(replaceMe.parent === null)
+  {
+    if(withMe === withMe.parent.left)
+    {
+      withMe.parent.left = replaceMe;
+    }
+    else
+    {
+      withMe.parent.right = replaceMe;
+    }
+    replaceMe.parent = withMe.parent;
+    this.m_root = withMe;
+    withMe.parent = null;
+
+  }
+  else
+  {
+    if(replaceMe === replaceMe.parent.left)
+    {
+      if(withMe === withMe.parent.left)
+      {
+        withMe.parent.left = replaceMe;
+      }
+      else
+      {
+        withMe.parent.right = replaceMe;
+      }
+
+      var P = replaceMe.parent;
+
+      replaceMe.parent.left = withMe;
+      replaceMe.parent = withMe.parent;
+      withMe.parent = P;
+
+    }
+    else
+    {
+      if(withMe === withMe.parent.left)
+      {
+        withMe.parent.left = replaceMe;
+      }
+      else
+      {
+        withMe.parent.right = replaceMe;
+      }
+
+      var P = replaceMe.parent;
+      replaceMe.parent.right = withMe;
+      replaceMe.parent = withMe.parent;
+      withMe.parent = P;
+    }
+  }
 };
 
 Set489.prototype.remove = function(value)
 {
-  var node = this.find(this.m_root, value);
+  var node = this.FindNode(this.m_root, value);
+  if(node !== null)
+  {
+    this.remove2(node);
 
+    if(this.GetNodeColor(this.m_root) === this.RED)
+    {
+      this.m_root.color = this.BLACK;
+    }
+    return true;
+  }
+  return false;
+}
+
+
+Set489.prototype.remove2 = function(node)
+{
   if(node === null)
   {
     return false;
@@ -252,37 +394,24 @@ Set489.prototype.remove = function(value)
 
   if(node.left !== null & node.right !== null)
   {
-    var pre = node.left;
-    while(pre.right !== null)
-    {
-      pre = pre.right;
-    }
-    node.value = pre.value;
-    //BST.prototype.removeFromLinkedList.call(this, node);
-    node = pre;
+    var max = BST.GetMax(node.left);
+    SwapNode(node, max);
+    return this.remove2(max);
   }
 
-  var child = (node.right === null) ? node.left : node.right;
-  if(GetNodeColor(node) === this.BLACK)
+
+  if(GetNodeColor(node) === this.RED)
   {
-    node.color = GetNodeColor(child);
-    this.BalanceDeleteNode(node);
+    return BST.remove.call(node.value);
   }
 
-  this.SwapNode(node, child);
-
-  if(this.GetNodeColor(this.m_root) === this.RED)
-  {
-    this.m_root.color = this.BLACK;
-  }
-  BST.prototype.removeFromLinkedList.call(this, node);
-  return true;
+  this.BalanceDeleteNode(node);
+  return BST.remove.call(this, node.value);
 };
 
 Set489.prototype.BalanceDeleteNode = function(node, child)
 {
   this.DeleteCase1(node);
-
 };
 
 Set489.prototype.DeleteCase1 = function(node)
@@ -391,55 +520,3 @@ Set489.prototype.DelteCase6 = function(node)
     this.RotateRight(node.parent);
   }
 };
-
-Set489.prototype.Balance = function(InsertedNode)
-{
-  if(InsertedNode.parent === null)
-  {
-    this.InsertCase1(InsertedNode);
-  }
-  else
-  {
-    this.InsertCase2(InsertedNode);
-  }
-};
-
-Set489.prototype.GetNodeColor = function(node)
-{
-  return node === null ? this.BLACK : node.color;
-}
-
-
-Set489.prototype.forEach = function(callback, useInsertionOrder, current)
-{
-  //return BST.prototype.forEach.call(this, callback, useInsertionOrder);
-
-  if(useInsertionOrder === true)
-  {
-    var c = this.m_first;
-    while(c !== null)
-    {
-      callback.call(this, c.value, this.m_root);
-      c = c.next;
-    }
-  }
-  else
-  {
-    if(current === undefined)
-    {
-      current = this.m_root;
-    }
-    if(current === undefined)
-    {
-      return
-    }
-    if(current != null)
-    {
-      this.forEach(callback, useInsertionOrder, current.left);
-      callback.call(this, current.value, this.m_root);
-      this.forEach(callback, useInsertionOrder, current.right);
-    }
-  }
-};
-
-// and more of your code down here

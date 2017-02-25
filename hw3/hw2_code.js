@@ -33,12 +33,30 @@ BST.prototype.compare = function(first, seccond)
 
 BST.prototype.add = function(newValue)
 {
+  var x = this.add2(newValue);
+  if(x === false)
+  {
+    return false;
+  }
+  else if(x === null)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+
+}
+
+BST.prototype.add2 = function(newValue)
+{
   if(this.m_root == null)
   {
     this.m_root = new NODE(newValue);
     this.m_first = this.m_root;
     this.m_last = this.m_root;
-    return true;
+    return this.m_root;
   }
   else
   {
@@ -64,7 +82,7 @@ BST.prototype.add = function(newValue)
           this.m_last.next = current;
           current.previous = this.m_last;
           this.m_last = current;
-          return true;
+          return current;
         }
       }
       else
@@ -79,7 +97,7 @@ BST.prototype.add = function(newValue)
           this.m_last.next = current;
           current.previous = this.m_last;
           this.m_last = current;
-          return true;
+          return current;
         }
 
       }
