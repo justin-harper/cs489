@@ -1,5 +1,5 @@
 <html>
-<title>Sudoku Solver v1.0</title>
+<title>Sudoku Solver v1.3</title>
 <script language="JavaScript" src="Sudoku9x9.js"></script>
 <script language="JavaScript">
 
@@ -380,12 +380,10 @@ function Solve()
         }
     }
     
-    // Construct the Sudoku9x9 object from an array
-    var puzzleObj = new Sudoku9x9(puzzle);
-    
-    // Solve it
+    // Construct the Sudoku9x9 object from an array and solve it
     var start = -1, end = -1;
     if (window.performance) { start = performance.now(); }
+	var puzzleObj = new Sudoku9x9(puzzle);
     var solveResult = puzzleObj.solve();
     if (window.performance) { end = performance.now(); }
     

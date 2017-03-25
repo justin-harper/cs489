@@ -1,5 +1,5 @@
 <html>
-<title>Sudoku Units Tests v1.1</title>
+<title>Sudoku Units Tests v1.5</title>
 <script src="Sudoku9x9.js"></script>
 <script>
 function AllTests()
@@ -109,7 +109,7 @@ function AllTests()
       1,2,3, 4,5,6, 7,8,9,
       3,9,7, 5,4,6, 8,1,2
     ];
-    var puzzle = new Sudoku9x9(NumsToCells(puzzleData));
+    var puzzle = new Sudoku9x9(puzzleData);
     testCases =
     [
     //   row,col expected_cells
