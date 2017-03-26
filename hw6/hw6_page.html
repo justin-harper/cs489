@@ -1,0 +1,246 @@
+<!-- If you use additional .js files, make sure to reference them in this file and -->
+<!-- include them in your submission (zip all files together). -->
+<html>
+    
+<script>
+    
+// Helpful links:
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
+    
+var g_animating = false;
+var g_colors = ["red", "green", "blue", "yellow", "cyan", "magenta", "orange", "gray"];
+var g_DynamicDisks = new Array();
+var g_StaticDisks = new Array();
+
+function init()
+{
+    // Setup event listeners
+    var canvas = document.getElementById("drawHere");
+    canvas.addEventListener("click", canvasClick);
+
+	// You may add any necessary initialization code here
+    
+    // Do initial rendering
+    render();
+}
+
+function btnStartStopClick()
+{
+    // Toggle animation on/off
+    // When stopping the animation, all objects freeze in their current position
+    // When resuming the animation, all objects move from their current position (i.e.
+    // they don't all of a sudden jump halfway across the canvas, they move from their
+    // frozen location).
+    g_animating = !g_animating;
+    if (g_animating)
+    {
+        render();
+    }
+}
+
+function canvasClick(event)
+{
+    // Click without shift key == create new dynamic object
+	// Click with shift key == create new static object
+	// Your code here
+    var c = document.getElementById("drawHere");
+    var ctx = c.getContext("2d");
+    var color = GetRandom(0, g_colors.length - 1);
+    ctx.beginPath();
+
+    if(event.shiftKey === true)
+    {
+        DoStaticCircle(ctx, color, event.layerX, event.layerY);
+    }
+    else
+    {
+        DoDynamicCircle(ctx, color, event.layerX, event.layerY);
+    }
+}
+
+function DoStaticCircle(ctx, color, x, y)
+{
+    var r = GetRandom(20, 40);
+    var disk =
+    {
+        x: CheckX(x, r, ctx.canvas.width),
+        y: CheckY(y, r, ctx.canvas.height),
+        color: g_colors[color],
+        radius: r
+    };
+
+    g_StaticDisks.push(disk);
+    DrawStaticCircle(ctx, disk);
+}
+
+function DoDynamicCircle(ctx, color, x, y)
+{
+    var r = GetRandom(10, 20);
+    var vX = GetRandom(-5, 5);
+    var vY = GetRandom(-5, 5);
+
+    while(vX === 0)
+    {
+        vX = GetRandom(-5, 5);
+    }
+    while(vY === 0)
+    {
+        vY = GetRandom(-5, 5);
+    }
+
+    var disk =
+    {
+        x: CheckX(x, r, ctx.canvas.width),
+        y: CheckY(y, r, ctx.canvas.height),
+        velocityX: vX,
+        velocityY: vY,
+        color: g_colors[color],
+        radius: r,
+        direction: GetRandom(0, 360)
+    };
+
+    g_DynamicDisks.push(disk);
+    DrawDynamicCircle(ctx, disk);
+}
+
+function CheckX(x, radius, maxWidth)
+{
+    if(x + radius > maxWidth)
+    {
+        return maxWidth - radius - 1;
+    }
+    else if(x - radius < 0)
+    {
+        return radius + 1;
+    }
+    else
+    {
+        return x;
+    }
+}
+
+function CheckY(y, radius, maxHeight)
+{
+    if(y + radius > maxHeight)
+    {
+        return maxHeight - radius - 1;
+    }
+    else if(y - radius < 0)
+    {
+        return radius + 1;
+    }
+    else
+    {
+        return y;
+    }
+}
+
+function DrawDynamicCircle(ctx, disk)
+{
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(disk.x, disk.y, disk.radius, 0, 2 * (Math.PI));
+    ctx.fillStyle = disk.color;
+    ctx.fill();
+    ctx.restore();
+}
+
+function DrawStaticCircle(ctx, disk)
+{
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(disk.x, disk.y, disk.radius, 0, 2 * (Math.PI));
+    ctx.fillStyle = disk.color;
+    ctx.fill();
+    ctx.fillStyle = "black";
+    ctx.font = disk.radius + "px serif";
+    ctx.textAlign = "center";
+    ctx.fillText("S", disk.x, disk.y + 7);
+    ctx.restore();
+}
+
+function GetRandom(min, max)
+{
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+                            
+function render()
+{
+    // Your rendering code here
+    var c = document.getElementById("drawHere");
+    var ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    for(var disk of g_StaticDisks)
+    {
+        DrawStaticCircle(ctx, disk);
+    }
+
+    for(var disk of g_DynamicDisks)
+    {
+        UpdateDisk(disk, ctx);
+        DrawDynamicCircle(ctx, disk);
+    }
+
+    // Set timeout to render next frame
+    if (g_animating)
+        window.setTimeout(function() { render(); }, 20);
+}
+
+function UpdateDisk(disk, ctx)
+{
+    if(disk.x + disk.velocityX + disk.radius > ctx.canvas.width ||
+       disk.x + disk.velocityX - disk.radius < 0 )
+    {
+        disk.velocityX = -disk.velocityX;
+//        if(disk.x < 2)
+//        {
+//            disk.x += disk.radius;
+//        }
+//        else if(disk.x > ctx.canvas.width - 2)
+//        {
+//            disk.x -= disk.radius;
+//        }
+
+    }
+    if(disk.y + disk.velocityY + disk.radius > ctx.canvas.height ||
+       disk.y + disk.velocityY - disk.radius < 0)
+    {
+        disk.velocityY = -disk.velocityY;
+//        if(disk.y < 2)
+//        {
+//            disk.y += disk.radius;
+//        }
+//        else if(disk.y > ctx.canvas.height - 2)
+//        {
+//            disk.y -= disk.radius;
+//        }
+    }
+    for(var sDisk of g_StaticDisks)
+    {
+        var dx = disk.x - sDisk.x;
+        var dy = disk.y - sDisk.y;
+
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        if(distance < disk.radius + sDisk.radius)
+        {
+            disk.velocityY = -(disk.velocityY);
+            disk.velocityX = -(disk.velocityX);
+
+        }
+    }
+
+    disk.x += disk.velocityX;
+    disk.y += disk.velocityY;
+}
+
+</script>
+<body onload="init()">
+    <h3>HW6 - Canvas Animation v1.0</h3>
+    <canvas id="drawHere" width="800" height="600"></canvas>
+    <br>
+    <input type="button" onclick="btnStartStopClick()" value="Start/Stop Animation"/>
+    <br>
+    Click to add a dynamic object, hold shift and click to a static object
+<html>
