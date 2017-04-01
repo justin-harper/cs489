@@ -9,9 +9,9 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
     
 var g_animating = false;
-var g_colors = ["red", "green", "blue", "yellow", "cyan", "magenta", "orange", "gray"];
-var g_DynamicDisks = new Array();
-var g_StaticDisks = new Array();
+var g_colors = ["red", "green", "blue", "yellow", "cyan", "magenta", "orange", "white"];
+var g_DynamicDisks = [];
+var g_StaticDisks = [];
 
 function init()
 {
@@ -46,65 +46,65 @@ function canvasClick(event)
 	// Your code here
     var c = document.getElementById("drawHere");
     var ctx = c.getContext("2d");
-    var color = GetRandom(0, g_colors.length - 1);
+    var color = getRandom(0, g_colors.length - 1);
     ctx.beginPath();
 
     if(event.shiftKey === true)
     {
-        DoStaticCircle(ctx, color, event.layerX, event.layerY);
+        doStaticCircle(ctx, color, event.layerX, event.layerY);
     }
     else
     {
-        DoDynamicCircle(ctx, color, event.layerX, event.layerY);
+        doDynamicCircle(ctx, color, event.layerX, event.layerY);
     }
 }
 
-function DoStaticCircle(ctx, color, x, y)
+function doStaticCircle(ctx, color, x, y)
 {
-    var r = GetRandom(20, 40);
+    var r = getRandom(20, 40);
     var disk =
     {
-        x: CheckX(x, r, ctx.canvas.width),
-        y: CheckY(y, r, ctx.canvas.height),
+        x: checkX(x, r, ctx.canvas.width),
+        y: checkY(y, r, ctx.canvas.height),
         color: g_colors[color],
         radius: r
     };
 
     g_StaticDisks.push(disk);
-    DrawStaticCircle(ctx, disk);
+    drawStaticCircle(ctx, disk);
 }
 
-function DoDynamicCircle(ctx, color, x, y)
+function doDynamicCircle(ctx, color, x, y)
 {
-    var r = GetRandom(10, 20);
-    var vX = GetRandom(-5, 5);
-    var vY = GetRandom(-5, 5);
+    var r = getRandom(10, 20);
+    var vX = getRandom(-5, 5);
+    var vY = getRandom(-5, 5);
 
     while(vX === 0)
     {
-        vX = GetRandom(-5, 5);
+        vX = getRandom(-5, 5);
     }
     while(vY === 0)
     {
-        vY = GetRandom(-5, 5);
+        vY = getRandom(-5, 5);
     }
 
     var disk =
     {
-        x: CheckX(x, r, ctx.canvas.width),
-        y: CheckY(y, r, ctx.canvas.height),
+        x: checkX(x, r, ctx.canvas.width),
+        y: checkY(y, r, ctx.canvas.height),
         velocityX: vX,
         velocityY: vY,
         color: g_colors[color],
         radius: r,
-        direction: GetRandom(0, 360)
+        direction: getRandom(0, 360)
     };
 
     g_DynamicDisks.push(disk);
-    DrawDynamicCircle(ctx, disk);
+    drawDynamicCircle(ctx, disk);
 }
 
-function CheckX(x, radius, maxWidth)
+function checkX(x, radius, maxWidth)
 {
     if(x + radius > maxWidth)
     {
@@ -120,7 +120,7 @@ function CheckX(x, radius, maxWidth)
     }
 }
 
-function CheckY(y, radius, maxHeight)
+function checkY(y, radius, maxHeight)
 {
     if(y + radius > maxHeight)
     {
@@ -136,7 +136,7 @@ function CheckY(y, radius, maxHeight)
     }
 }
 
-function DrawDynamicCircle(ctx, disk)
+function drawDynamicCircle(ctx, disk)
 {
     ctx.save();
     ctx.beginPath();
@@ -146,7 +146,7 @@ function DrawDynamicCircle(ctx, disk)
     ctx.restore();
 }
 
-function DrawStaticCircle(ctx, disk)
+function drawStaticCircle(ctx, disk)
 {
     ctx.save();
     ctx.beginPath();
@@ -160,7 +160,7 @@ function DrawStaticCircle(ctx, disk)
     ctx.restore();
 }
 
-function GetRandom(min, max)
+function getRandom(min, max)
 {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -174,13 +174,13 @@ function render()
 
     for(var disk of g_StaticDisks)
     {
-        DrawStaticCircle(ctx, disk);
+        drawStaticCircle(ctx, disk);
     }
 
     for(var disk of g_DynamicDisks)
     {
-        UpdateDisk(disk, ctx);
-        DrawDynamicCircle(ctx, disk);
+        updateDisk(disk, ctx);
+        drawDynamicCircle(ctx, disk);
     }
 
     // Set timeout to render next frame
@@ -188,7 +188,7 @@ function render()
         window.setTimeout(function() { render(); }, 20);
 }
 
-function UpdateDisk(disk, ctx)
+function updateDisk(disk, ctx)
 {
     if(disk.x + disk.velocityX + disk.radius > ctx.canvas.width ||
        disk.x + disk.velocityX - disk.radius < 0 )
@@ -238,7 +238,7 @@ function UpdateDisk(disk, ctx)
 </script>
 <body onload="init()">
     <h3>HW6 - Canvas Animation v1.0</h3>
-    <canvas id="drawHere" width="800" height="600"></canvas>
+    <canvas id="drawHere" width="800" height="600" style="background: grey"></canvas>
     <br>
     <input type="button" onclick="btnStartStopClick()" value="Start/Stop Animation"/>
     <br>
