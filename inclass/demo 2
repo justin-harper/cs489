@@ -1,0 +1,26 @@
+var fs = require("fs");
+var http = require("http");
+
+var data = "(default)";
+
+var handler = function(request, responce)
+{
+  responce.writeHead(200, {"Content-Type": "text/html", "Access-Control-Allow-Origin": "*"});
+
+  if(request.method == "GET")
+  {
+    responce.write("<html><body>");
+    responce.write(data);
+    responce.end("</body></html>");
+  }
+  else if(request.method == "POST")
+  {
+    reqest.on("data", function(chunk)
+    {
+      console.log(chunk);
+    });
+  }
+}
+
+http.createServer(handler).listen(7070);
+console.log("Server running on http://localhost:7070/");
