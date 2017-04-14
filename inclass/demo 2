@@ -15,10 +15,11 @@ var handler = function(request, responce)
   }
   else if(request.method == "POST")
   {
-    reqest.on("data", function(chunk)
+    request.on("data", function(chunk)
     {
       console.log(chunk);
     });
+    
   }
 }
 
