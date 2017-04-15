@@ -2,41 +2,141 @@ var fs = require("fs");
 var http = require("http");
 var path = require("path");
 
-var handler = function(request, responce)
+function GetType(stats, file)
 {
-  responce.writeHead(200, {"Content-Type" : "text/json", "Access-Control-Allow-Origin": "*"});
-
-  var p = "./";
-
-  fs.readdir(p, function(err, files)
+  if(stats.isFile())
   {
-    if(err)
+    var ext = path.extname(file);
+
+    if(ext === "")
     {
-      responce.end("error: " + err.toString());
-      return;
+      return "file";
     }
-
-    var directory = new Array();
-
-    files.map(function(file)
+    else
     {
-      return path.join(p, file);
-    }).forEach(function(file)
-    {
-      //responce.write(file.toString() + " (" + path.extname(file).toString() + ")\n");
-      directory.push({"name": file, "type": path.extname(file)});
+      return ext;
+    }
+  }
+  else if(stats.isDirectory())
+  {
+    return "dir";
+  }
+}
 
-      //console.log("%s (%s)", file, path.extname(file));
-    });
-    var z = JSON.stringify(directory);
-    console.log(z);
-    responce.end(JSON.stringify(directory));
-  })
-
+function GetMIMEType(type)
+{
+  if(type === ".mov")
+  {
+    return "video/quicktime";
+  }
+  if(type === ".avi")
+  {
+    return "video/avi";
+  }
+  if(type === "file")
+  {
+    return "text/plain";
+  }
+  if(type === ".mp3")
+  {
+    return "audio/mp3";
+  }
+  if(type === ".pdf")
+  {
+    return "application/pdf";
+  }
+  if(type === ".js")
+  {
+    return "text/javascript"
+  }
+  if(type === ".txt")
+  {
+    return "text/plain";
+  }
+  if(type === ".jpg")
+  {
+    return "image/jpeg";
+  }
+  if(type === ".png")
+  {
+    return "image/png";
+  }
+  if(type === ".gif")
+  {
+    return "image/gif";
+  }
+  // ... and many more
 
 }
 
-//var callme =
+var handler = function(request, responce)
+{
+
+  if(request.url === "/favicon.ico")
+  {
+    responce.writeHead(404);
+    responce.end();
+    return;
+  }
+
+
+
+
+
+
+  var p = "." + request.url;
+  console.log(p);
+  try
+  {
+    var s = fs.statSync(p);
+
+    if (s.isDirectory())
+    {
+      responce.writeHead(200, {"Content-Type" : "text/json", "Access-Control-Allow-Origin": "*"});
+      fs.readdir(p, function (err, files)
+      {
+        if (err)
+        {
+          responce.end("error: " + err.toString());
+          return;
+        }
+
+        var directory = [];
+
+        files.map(function (file)
+        {
+          return path.join(p, file);
+        }).forEach(function (file)
+        {
+          var stats = fs.statSync(file);
+          var type = GetType(stats, file);
+
+          var x = {"name": file, "type": type, "stats": stats};
+          directory.push(x);
+
+        });
+        var z = JSON.stringify(directory);
+        //console.log(z);
+        responce.end(JSON.stringify(directory));
+      })
+    }
+    else
+    {
+      var ContentType = GetMIMEType(GetType(s, p));
+
+      responce.writeHead(200, {"Content-Type" : ContentType, "Access-Control-Allow-Origin": "*"})
+      var readS = fs.createReadStream(p);
+      readS.pipe(responce);
+    }
+  }
+  catch (e)
+  {
+    console.log("ERROR: " + e);
+  }
+
+};
+
+
 
 http.createServer(handler).listen(7070);
 console.log("Server running @ localhost:7070/");
