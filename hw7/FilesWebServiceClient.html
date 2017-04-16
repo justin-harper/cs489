@@ -1,16 +1,198 @@
 <!-- put your name and ID number here -->
 <html>
+<style>
+    table, td, tr
+    {
+        border: 2px solid black;
+    }
+</style>
+
 <script language="JavaScript">
 
-// For simplicity, use this hard-coded URL as the base URL for your 
-// requests. Use XMLHttpRequest and have the URL be g_serviceURL 
+// For simplicity, use this hard-coded URL as the base URL for your
+// requests. Use XMLHttpRequest and have the URL be g_serviceURL
 // plus a concatenated portion as appropriate.
-var g_serviceURL = "http://localhost:8080/";
+var g_serviceURL = "http://localhost:7070/";
+
+function SetBOnclick(b, trNew, itemName)
+{
+  b.innerText = "Expand";
+  b.onclick = function(){ExpandDirectoryButtonHandler(trNew, itemName, b);};
+}
+
+function SwitchClickHandlerToCollapse(b, tr, itemName)
+{
+  b.onclick = function() {CollapseDirectoryButtonHandler(b, tr, itemName)};
+  b.innerText = "Collapse";
+}
+
+function CollapseDirectoryButtonHandler(b, tr, itemName)
+{
+  for(var c of tr.childNodes)
+  {
+    if(c.id == "Table")
+    {
+      tr.removeChild(c);
+    }
+  }
+  SetBOnclick(b, tr, itemName);
+
+}
+
+function ExpandDirectoryButtonHandler(tr, itemName, b)
+{
+
+  var http = new XMLHttpRequest();
+  http.open("GET", g_serviceURL + itemName, true);
+
+  http.onreadystatechange = function()
+  {
+    if(http.readyState == 4 && http.status == 200)
+    {
+      BuildTable(JSON.parse(http.response), tr);
+      SwitchClickHandlerToCollapse(b, tr, itemName);
+    }
+  };
+  http.send();
+}
+
+function BuildTable(responce, tr)
+{
+
+    var div = document.getElementById('this');
+    var table = document.createElement("table");
+    var trHead = document.createElement("tr");
+    var tdHead1 = document.createElement("td");
+    var tdHead2 = document.createElement("td");
+    var tdHead3 = document.createElement("td");
+    var tdHead4 = document.createElement("td");
+
+    tdHead1.appendChild(document.createTextNode("File"));
+    tdHead2.appendChild(document.createTextNode("Type"));
+    tdHead3.appendChild(document.createTextNode("Size"));
+    tdHead4.appendChild(document.createTextNode("Last Modified"));
+
+    trHead.appendChild(tdHead1);
+    trHead.appendChild(tdHead2);
+    trHead.appendChild(tdHead3);
+    trHead.appendChild(tdHead4);
+
+    table.appendChild(trHead);
+
+
+    for (var item of responce)
+    {
+      if (item.type === "")
+      {
+        console.log(item);
+        item.type = "dir";
+      }
+
+      var trNew = document.createElement("tr");
+
+      var td = document.createElement("td");
+      var td2 = document.createElement("td");
+      var td3 = document.createElement("td");
+      var td4 = document.createElement("td");
+
+      if (item.type !== "dir")
+      {
+        var a = document.createElement("a");
+
+        var txt = document.createTextNode(item.name);
+
+        var txt2 = document.createTextNode(item.type);
+        var txt3 = document.createTextNode(item.stats.size);
+        var txt4 = document.createTextNode(new Date(item.stats.mtime));
+
+        a.appendChild(txt);
+        a.href = "http://localhost:7070/" + item.name;
+
+        td.style.border = "2px solid red";
+        td.appendChild(a);
+
+
+        td2.appendChild(txt2);
+        td3.appendChild(txt3);
+        td4.appendChild(txt4);
+
+        trNew.appendChild(td);
+        trNew.appendChild(td2);
+        trNew.appendChild(td3);
+        trNew.appendChild(td4);
+
+        table.appendChild(trNew);
+      }
+      else
+      {
+        var a = document.createElement("text");
+
+        var txt = document.createTextNode(item.name);
+
+        var txt2 = document.createTextNode(item.type);
+        var txt3 = document.createTextNode("");
+        var txt4 = document.createTextNode(new Date(item.stats.mtime));
+
+        a.appendChild(txt);
+        a.href = "http://localhost:7070/" + item.name;
+        var b = document.createElement("button");
+        b.innerText = "Expand";
+        SetBOnclick(b, trNew, item.name);
+
+
+
+        a.appendChild(b);
+
+        td.style.border = "2px solid red";
+        td.appendChild(a);
+
+
+        td2.appendChild(txt2);
+        td3.appendChild(txt3);
+        td4.appendChild(txt4);
+
+        trNew.appendChild(td);
+        trNew.appendChild(td2);
+        trNew.appendChild(td3);
+        trNew.appendChild(td4);
+
+        table.appendChild(trNew);
+      }
+    }
+
+
+    table.style.border = "2px solid black";
+
+    if(tr === undefined)
+    {
+      div.appendChild(table)
+    }
+    else
+    {
+      table.id = "Table";
+      tr.appendChild(table);
+    }
+}
+
 
 function PageLoaded()
 {
-	// Your code here - dynamically generate page content
+    var http = new XMLHttpRequest();
+    http.open("GET", g_serviceURL, true);
+
+    http.onreadystatechange = function()
+    {
+        if(http.readyState == 4 && http.status == 200)
+        {
+            document.getElementById("this").innerHTML = "";
+            BuildTable(JSON.parse(http.response));
+        }
+    };
+    http.send();
 }
 </script>
-<body onload="PageLoaded()">(loading...)</body>
+<body onload="PageLoaded()">
+	<div id="this">(loading...)
+	</div>
+	</body>
 </html>
