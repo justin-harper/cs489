@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #map
+      {
+        height: 400px;
+        width: 800px;
+      }
+    </style>
+  </head>
+  <script src="https://maps.googleapis.com/maps/api/js">
+  </script>
+  <script>
+  var store = [];
+  var timeout = 0;
+  var markers = [];
+  var coords = [];
+  var map;
+  function thisOne()
+  {
+    //pullman: Lat: 46.739106299999996, Lng: -117.17546879999999
+    var pullman = { lat: 46.734, lng: -117.16 };
+    map = new google.maps.Map(document.getElementById('map'),
+    {
+        zoom: 14,
+        center: pullman
+    });
+
+    // var marker = new google.maps.Marker({ position: uluru, map: map});
+
+    doTimeout();
+  }
+
+
+  function getLocation()
+  {
+    var output = document.getElementById('output');
+    if(navigator.geolocation)
+    {
+      navigator.geolocation.getCurrentPosition(showPosition,errorCallback,{timeout:10000})
+    }
+    else
+    {
+      output.innerHTML = "GeoLocation is not supported on this browser";
+    }
+
+  }
+  function doTimeout()
+  {
+    if(timeout < 10)
+    {
+      timeout++;
+      setTimeout(doTimeout, 5000);
+      getLocation();
+    }
+  }
+
+  function showPosition(position)
+  {
+    store.push(position.coords);
+    console.log(position);
+    var output = document.getElementById('output');
+    output.innerHTML = ShowStore();
+    var x = {lat: position.coords.latitude, lng: position.coords.longitude};
+    coords.push(x);
+    // var map = new google.maps.Map(document.getElementById('map'),
+    // {
+    //   zoom: 20,
+    //   center: x
+    // });
+    var j = document.getElementById('json');
+
+
+
+
+
+    markers.push(new google.maps.Marker({position: x, map: map}));
+    j.innerHTML = JSON.stringify(coords);
+
+
+  }
+  function errorCallback(error)
+  {
+    var output = document.getElementById('output');
+    output.innerHTML = "ERROR getting location";
+    console.log(error);
+  }
+
+  function ShowStore()
+  {
+    var x = "[ "
+    for(var i = 0; i < store.length; i++)
+    {
+      x += "<br>" +  "Lat: " + store[i].latitude + ", Lng: " + store[i].longitude;
+    }
+    x += "<br>]";
+
+    return x;
+  }
+  </script>
+  <body onload="thisOne()">
+    <div>
+      <h1> Stuff &amp Things </h1>
+      <p id="output">HI!</p>
+    </div>
+    <div id="map">
+    </div>
+    <div id="json">
+    </div>
+  <body>
+</html>
