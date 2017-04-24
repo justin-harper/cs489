@@ -38,7 +38,7 @@
     var output = document.getElementById('output');
     if(navigator.geolocation)
     {
-      navigator.geolocation.getCurrentPosition(showPosition,errorCallback,{timeout:10000})
+      navigator.geolocation.getCurrentPosition(showPosition,errorCallback,{maximumAge:1, timeout:2000, enableHighAccuracy: true})
     }
     else
     {
@@ -48,7 +48,7 @@
   }
   function doTimeout()
   {
-    if(timeout < 10)
+    if(timeout < 250)
     {
       timeout++;
       setTimeout(doTimeout, 5000);
@@ -59,9 +59,9 @@
   function showPosition(position)
   {
     store.push(position.coords);
-    console.log(position);
+
     var output = document.getElementById('output');
-    output.innerHTML = ShowStore();
+    //output.innerHTML = ShowStore();
     var x = {lat: position.coords.latitude, lng: position.coords.longitude};
     coords.push(x);
     // var map = new google.maps.Map(document.getElementById('map'),
@@ -69,14 +69,14 @@
     //   zoom: 20,
     //   center: x
     // });
-    var j = document.getElementById('json');
+    // var j = document.getElementById('json');
 
 
 
 
 
     markers.push(new google.maps.Marker({position: x, map: map}));
-    j.innerHTML = JSON.stringify(coords);
+    output.innerHTML = JSON.stringify(coords);
 
 
   }
